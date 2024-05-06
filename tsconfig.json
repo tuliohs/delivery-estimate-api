@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                    /* Especifica para qual versão do ECMAScript seu código será compilado */
+    "module": "CommonJS",                  /* Especifica o sistema de módulos a ser usado (ex: "CommonJS", "ESNext") */
+    "strict": true,                        /* Ativa todas as opções de verificação de tipo */
+    "esModuleInterop": true,               /* Habilita interoperabilidade com módulos ES6 (ESM) */
+    "skipLibCheck": true,                  /* Ignora a verificação de tipos para arquivos de biblioteca definidos no "tsconfig.json" */
+    "forceConsistentCasingInFileNames": true,  /* Garante que os nomes de arquivos tenham o mesmo padrão de caixa */
+    "outDir": "./dist",                    /* Especifica o diretório de saída para os arquivos compilados */
+    "rootDir": "./src",                    /* Especifica o diretório raiz dos arquivos TypeScript */
+    "resolveJsonModule": true,             /* Permite a importação de arquivos JSON */
+    "declaration": true,                   /* Gera arquivos de declaração (.d.ts) para módulos TypeScript */
+    "sourceMap": true,                      /* Gera arquivos de mapa de origem (.map) para depuração */
+    "allowJs": true
+  },
+  "include": ["src/**/*", "src/controllers/quotation.controller.ts"],                 /* Especifica quais arquivos devem ser incluídos na compilação */
+  "exclude": ["node_modules", "functions"]      /* Especifica quais arquivos/devem ser excluídos da compilação */
+}
