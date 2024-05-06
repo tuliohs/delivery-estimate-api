@@ -24,7 +24,15 @@ export default class FlexQuotation implements QuotationAdapter {
         'Betim',
         'Ribeirão das Neves',
         'Nova Lima',
-        'Venda Nova'
+        'Venda Nova',
+        'Brumadinho',
+        'Sarzedo',
+        'Igarapé',
+        'Mateus Leme',
+        'Juatuba',
+        'Pedro Leopoldo',
+        'Lagoa Santa',
+        'Caeté'
     ]
     constructor() {
     }
