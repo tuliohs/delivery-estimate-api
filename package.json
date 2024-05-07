@@ -1,0 +1,48 @@
+{
+  "name": "delivery-quotation-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "deploy": "vercel --prod",
+    "deploy:dev": "vercel",
+    "build": "rimraf dist && tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase": "^10.11.0",
+    "firebase-admin": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/firebase": "^3.2.1",
+    "@types/node": "^20.11.26",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "nodemon": "^2.0.13",
+    "pre-commit": "^1.2.2",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
