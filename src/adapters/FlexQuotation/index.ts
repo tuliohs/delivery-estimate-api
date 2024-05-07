@@ -1,9 +1,9 @@
-import axios from "axios";
 import type { Quotation } from "../../models/Quotation";
 import type { QuotationRequest } from "../../models/Shipping";
 import type { QuotationAdapter } from "../core/types/QuotationAdapter";
 
 import * as dotenv from 'dotenv';
+import locationService from "../../services/location.service";
 dotenv.config();
 
 export const sanitize = (name: string) =>
@@ -67,9 +67,7 @@ export default class FlexQuotation implements QuotationAdapter {
 
     async quotation(quotation: QuotationRequest): Promise<Quotation> {
         try {
-            const { data: buscaCEP } = await axios.get(`https://viacep.com.br/ws/${quotation.customerTo.adress.zipCode}/json/`);
-
-            const city = buscaCEP.localidade;
+            const { city } = await locationService.getAddressByCep(quotation.customerTo.adress.zipCode);
 
             const zipCodeIServiced = this.servicedCities.map((item) => sanitize(item)).includes(sanitize(city))
 
@@ -85,9 +83,7 @@ export default class FlexQuotation implements QuotationAdapter {
                     service: 'Avulso',
                     price: 11.99,
                     deliveryEstimate: this.getDeliveryDate()
-                }],
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                _metadata: { buscaCEP: buscaCEP } as any
+                }]
             }
         } catch (error) {
             console.error(error);
