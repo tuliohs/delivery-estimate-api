@@ -6,6 +6,7 @@ import type { Quotation } from '../models/Quotation';
 import MelhorQuotation from '../adapters/MelhorQuotation';
 import KgQuotation from '../adapters/KgQuotation';
 import FlexQuotation from '../adapters/FlexQuotation';
+import LogQuotation from '../adapters/LogQuotation';
 
 const quotationController = {
 
@@ -27,30 +28,34 @@ const quotationController = {
             } else {
                 throw new Error("Informe o codigo ou as dimensões do pacote");
             }
-            const quotation: Quotation = {} as Quotation;
+            const quotation: Quotation = { options: [], _metadata: [] } as Quotation;
 
             if (!shipping)
                 throw new Error('Erro ao criar envio');
+            const logQuotationAdapter = new LogQuotation();
+            const logQuotationsOptions = await logQuotationAdapter.quotation(shipping)
+            quotation.options = [...quotation.options, ...logQuotationsOptions.options];
+            quotation._metadata = [{ logQuotation: logQuotationsOptions._metadata }];
 
             const melhorQuotationAdapter = new MelhorQuotation();
             const melhorQuotationsOptions = await melhorQuotationAdapter.quotation(shipping)
-            quotation.options = [...melhorQuotationsOptions.options];
+            quotation.options = [...quotation.options, ...melhorQuotationsOptions.options];
             quotation._metadata = [{ melhorQuotation: melhorQuotationsOptions._metadata }];
 
             const kgQuotation = new KgQuotation();
             const kgQuotationOptions = await kgQuotation.quotation(shipping)
             quotation.options = [...quotation.options, ...kgQuotationOptions.options];
             quotation._metadata = [...quotation._metadata, { kgQuotationOptions: kgQuotationOptions._metadata }];
-            
+
             const flexQuotationAdapter = new FlexQuotation();
             const flexQuotationOptions = await flexQuotationAdapter.quotation(shipping)
             quotation.options = [...quotation.options, ...flexQuotationOptions.options];
             quotation._metadata = [...quotation._metadata, { flexQuotationOptions: flexQuotationOptions._metadata }];
 
             quotation.options = quotation.options
-            .filter((option) => option.price)
-            .sort((current, compared) => current.price - compared.price);
-            
+                .filter((option) => option.price)
+                .sort((current, compared) => current.price - compared.price);
+
             res.status(201).json(quotation);
         } catch (error) {
             console.error(error);
