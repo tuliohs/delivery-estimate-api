@@ -4,6 +4,8 @@ import type { QuotationRequest } from "../../models/Shipping";
 import type { QuotationAdapter } from "../core/types/QuotationAdapter";
 
 import * as dotenv from 'dotenv';
+import { addDays } from "date-fns";
+import { getNextBusinessDay } from "../../utils/date";
 dotenv.config();
 
 export default class MelhorQuotation implements QuotationAdapter {
@@ -25,6 +27,8 @@ export default class MelhorQuotation implements QuotationAdapter {
             const params = `from=${from}&to=${to}&width=${width}&weight=${weight}&height=${height}&length=${length}&insurance_value=${insurancePrice}&services=${availableServices}`
             const { data } = await this.adapterApi.get(`/calculator?${params}`);
 
+
+            const today: Date = new Date();
             return {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 options: data.map((option: any) => ({
@@ -32,7 +36,7 @@ export default class MelhorQuotation implements QuotationAdapter {
                     company: option?.company?.name,
                     service: option.name,
                     price: option.price,
-                    deliveryEstimate: option.delivery_time  
+                    deliveryEstimate: option.delivery_time ? getNextBusinessDay(addDays(today, option.delivery_time)) : undefined,
                 })),
                 _metadata: data
             }

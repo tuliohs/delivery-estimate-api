@@ -1,6 +1,7 @@
 import type { Quotation } from "../../models/Quotation";
 import type { QuotationRequest } from "../../models/Shipping";
 import type { QuotationAdapter } from "../core/types/QuotationAdapter";
+import { addDays, format } from 'date-fns';
 
 import * as dotenv from 'dotenv';
 import locationService from "../../services/location.service";
@@ -37,31 +38,28 @@ export default class FlexQuotation implements QuotationAdapter {
     constructor() {
     }
 
-    private getDeliveryDate() {
-        const now = new Date();
-        const dayOfWeek = now.getDay(); // Domingo: 0, Segunda: 1, Terça: 2, ..., Sábado: 6
-        const hour = now.getHours();
+    private getDeliveryDate(): string {
+        const now: Date = new Date();
+        const dayOfWeek: number = now.getDay(); // Domingo: 0, Segunda: 1, Terça: 2, ..., Sábado: 6
+        const hour: number = 19; // Sempre 19:00
 
-        const deliveryTimeStart = '15:30';
-        const deliveryTimeEnd = '21:00';
+        let deliveryDate: Date;
 
-        if ((dayOfWeek === 6 && hour >= 12) || dayOfWeek === 0) {
-            let daysToAdd;
-            if (dayOfWeek === 0) {
-                daysToAdd = 1;
-            } else {
-                daysToAdd = 2;
-            }
-            const monday = new Date(now);
-            monday.setDate(now.getDate() + daysToAdd);
-
-            const mondayFormatted = `${monday.getDate()}/${monday.getMonth() + 1}/${monday.getFullYear()}`;
-            return `Segunda-feira (${mondayFormatted}) entre ${deliveryTimeStart} e ${deliveryTimeEnd}`;
-        } else if (hour >= 12) {
-            return `Amanhã entre ${deliveryTimeStart} e ${deliveryTimeEnd}`;
-        } else {
-            return `Hoje entre ${deliveryTimeStart} e ${deliveryTimeEnd}`;
+        if (dayOfWeek === 0 || dayOfWeek === 6) { // Se for sábado ou domingo
+            const daysToAdd: number = dayOfWeek === 0 ? 1 : 2;
+            deliveryDate = addDays(now, daysToAdd);
+            deliveryDate.setHours(hour);
+            deliveryDate.setMinutes(0);
+            deliveryDate.setSeconds(0);
+        } else { // Se for um dia da semana
+            deliveryDate = addDays(now, 1);
+            deliveryDate.setHours(hour);
+            deliveryDate.setMinutes(0);
+            deliveryDate.setSeconds(0);
         }
+
+        const formattedDeliveryDate: string = format(deliveryDate, 'yyyy-MM-dd HH:mm:ss');
+        return formattedDeliveryDate;
     }
 
 
