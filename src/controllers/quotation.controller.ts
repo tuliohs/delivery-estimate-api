@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import packageService from '../services/packages.service';
 import type { QuotationRequest } from '../models/Shipping';
 import { defaultSender } from '../data/defaultData';
-import type { Quotation } from '../models/Quotation';
+import type { Quotation, QuotationOption, QuotationOptionTag } from '../models/Quotation';
 import MelhorQuotation from '../adapters/MelhorQuotation';
 import KgQuotation from '../adapters/KgQuotation';
 import FlexQuotation from '../adapters/FlexQuotation';
@@ -55,6 +55,34 @@ const quotationController = {
             quotation.options = quotation.options
                 .filter((option) => option.price)
                 .sort((current, compared) => current.price - compared.price);
+
+            let cheapestOption: QuotationOption | null = null;
+            quotation.options.forEach((option: QuotationOption) => {
+                if (option.price && (!cheapestOption || option.price < cheapestOption.price)) {
+                    if (cheapestOption) {
+                        cheapestOption.tags = (cheapestOption?.tags || []).filter((tag: QuotationOptionTag) => tag !== 'cheaper'); // Remove a tag 'cheaper' da opção anteriormente mais barata
+                    }
+                    cheapestOption = option;
+                    cheapestOption.tags = [...(cheapestOption?.tags || []), 'cheaper']; // Adiciona a tag 'cheaper' à opção mais barata
+                }
+            });
+
+            let fasterOption: QuotationOption | null = null;
+            quotation.options.forEach((option: QuotationOption) => {
+                if (option.deliveryEstimate || !fasterOption) {
+                    const currentOptionDeliveryEstimate = option.deliveryEstimate ? new Date(option.deliveryEstimate) : '';
+                    const comparedOptionDeliveryEstimate = fasterOption?.deliveryEstimate ? new Date(fasterOption?.deliveryEstimate) : '';
+                    if (!comparedOptionDeliveryEstimate || currentOptionDeliveryEstimate < comparedOptionDeliveryEstimate) {
+
+                        if (fasterOption) {
+                            fasterOption.tags = (fasterOption?.tags || []).filter((tag: QuotationOptionTag) => tag !== 'faster'); // Remove a tag 'cheaper' da opção anteriormente mais barata
+                        }
+                        fasterOption = option;
+                        fasterOption.tags = [...(fasterOption?.tags || []), 'faster'];
+                    }
+                }
+            });
+
 
             res.status(201).json(quotation);
         } catch (error) {
