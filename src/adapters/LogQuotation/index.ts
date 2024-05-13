@@ -32,7 +32,7 @@ export default class LogQuotation implements QuotationAdapter {
                     pickups: [
                     {
                         address: {
-                        address: "${addressTo.street}, ${addressTo.city} ${addressTo.state} ${addressTo.zipCode}",
+                        address: "${addressFrom.street}, ${addressFrom.city} ${addressFrom.state} ${addressFrom.zipCode}",
                         complement: ""
                         },
                         instructions: ""
@@ -42,7 +42,7 @@ export default class LogQuotation implements QuotationAdapter {
                     {
                         pickupIndex: 0,
                         address: {
-                        address: "${addressFrom.street}, ${addressFrom.city} ${addressFrom.state} ${addressFrom.zipCode}",
+                        address: "${addressTo.street}, ${addressTo.city} ${addressTo.state} ${addressTo.zipCode}",
                         complement: ""
                         },
                         instructions: ""
@@ -64,7 +64,12 @@ export default class LogQuotation implements QuotationAdapter {
                 `;
 
             const { data } = await this.adapterApi.post('', { query });
-
+            if (data?.data?.estimateCreateOrder?.packagesWithErrors?.length > 0) {
+                return {
+                    options: [],
+                    _metadata: data?.data?.estimateCreateOrder?.packagesWithErrors
+                }
+            }
             return {
                 options: [{
                     gateway: 'Log Quotation',

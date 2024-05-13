@@ -31,19 +31,19 @@ const quotationController = {
             } else {
                 throw new Error("Informe o codigo ou as dimensões do pacote");
             }
-            const quotation: Quotation = { options: [], _metadata: [] } as Quotation;
+            const quotation: Quotation = { package: shipping.package, options: [], _metadata: [] } as Quotation;
 
             if (!shipping)
                 throw new Error('Erro ao criar envio');
             const logQuotationAdapter = new LogQuotation();
             const logQuotationsOptions = await logQuotationAdapter.quotation(shipping)
             quotation.options = [...quotation.options, ...logQuotationsOptions.options];
-            quotation._metadata = [{ logQuotation: logQuotationsOptions._metadata }];
+            quotation._metadata = [...quotation._metadata || [], { logQuotation: logQuotationsOptions._metadata }];
 
             const melhorQuotationAdapter = new MelhorQuotation();
             const melhorQuotationsOptions = await melhorQuotationAdapter.quotation(shipping)
             quotation.options = [...quotation.options, ...melhorQuotationsOptions.options];
-            quotation._metadata = [{ melhorQuotation: melhorQuotationsOptions._metadata }];
+            quotation._metadata = [...quotation._metadata, { melhorQuotation: melhorQuotationsOptions._metadata }];
 
             const kgQuotation = new KgQuotation();
             const kgQuotationOptions = await kgQuotation.quotation(shipping)

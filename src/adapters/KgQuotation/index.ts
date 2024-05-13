@@ -23,8 +23,8 @@ export default class KgQuotation implements QuotationAdapter {
             const { zipCode: from } = quotation.customerFrom.adress
 
             const { data } = await this.adapterApi.post(`/tms/transporte/simular`, {
-                "cepOrigem": to,
-                "cepDestino": from,
+                "cepOrigem": from,
+                "cepDestino": to,
                 "vlrMerc": insurancePrice,
                 "pesoMerc": weight,
                 "volumes": [
