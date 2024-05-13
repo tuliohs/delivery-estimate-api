@@ -12,12 +12,15 @@ const quotationController = {
 
     async quotation(req: Request, res: Response) {
         try {
-            const { zipCode, packageId, weight, height, width, length, insurancePrice
-            } = req.query as { zipCode: string, packageId: string, weight: string, height: string, width: string, length: string, insurancePrice: string };
+            const { zipCode, packageId, weight, height, width, length, insurancePrice, reverse
+            } = req.query as {
+                zipCode: string, packageId: string, weight: string, height: string, width: string, length: string, insurancePrice: string, reverse: string | undefined
+            };
             const shipping: QuotationRequest = {
-                customerFrom: defaultSender,
-                customerTo: { adress: { zipCode } },
+                customerFrom: reverse ? { adress: { zipCode } } : defaultSender,
+                customerTo: reverse ? defaultSender : { adress: { zipCode } },
             } as QuotationRequest;
+
             if (packageId) {
                 shipping.package = await packageService.getById(packageId);
             } else if (weight && height && width && length) {

@@ -33,5 +33,13 @@ export const defaultPackages: Array<Package> = [
         length: 18,
         weight: 0.800,
         insurancePrice: 70
+    },
+    {
+        id: 'pacote5kg',
+        width: 25,
+        height: 25,
+        length: 40,
+        weight: 5,
+        insurancePrice: 300
     }
 ]

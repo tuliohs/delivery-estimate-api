@@ -54,6 +54,9 @@ export default class KgQuotation implements QuotationAdapter {
                 //"ordernar": "string"
             });
 
+            if (data?.error?.mensagem) {
+                return { _metadata: data?.error?.mensagem, options: [] } as Quotation
+            }
 
             return {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

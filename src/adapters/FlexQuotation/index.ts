@@ -65,15 +65,24 @@ export default class FlexQuotation implements QuotationAdapter {
 
     async quotation(quotation: QuotationRequest): Promise<Quotation> {
         try {
-            const { city } = await locationService.getAddressByCep(quotation.customerTo.adress.zipCode);
+            const { city: fromCity } = await locationService.getAddressByCep(quotation.customerFrom.adress.zipCode);
+            const { city: toCity } = await locationService.getAddressByCep(quotation.customerTo.adress.zipCode);
 
-            const zipCodeIServiced = this.servicedCities.map((item) => sanitize(item)).includes(sanitize(city))
-
-            if (!zipCodeIServiced)
+            const zipCodeIServicedForDelivery = this.servicedCities.map((item) => sanitize(item)).includes(sanitize(toCity))
+            if (!zipCodeIServicedForDelivery)
                 return {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     options: [], _metadata: { message: 'CEP não atendido pelo flex' } as any
                 }
+
+            const zipCodeIServicedForSended = this.servicedCities.map((item) => sanitize(item)).includes(sanitize(fromCity))
+            if (!zipCodeIServicedForSended)
+                return {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    options: [], _metadata: { message: 'CEP não recebe coleta do flex' } as any
+                }
+
+
             return {
                 options: [{
                     gateway: 'Flex Quotation',
