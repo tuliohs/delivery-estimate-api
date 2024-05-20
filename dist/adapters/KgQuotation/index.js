@@ -1,0 +1,95 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
+class KgQuotation {
+    adapterApi;
+    constructor() {
+        this.adapterApi = axios_1.default.create({
+            baseURL: `${process.env.KG_QUOTATION_URL}`,
+            headers: { token: process.env.KG_QUOTATION_TOKEN }
+        });
+    }
+    async quotation(quotation) {
+        try {
+            const { width, height, length, weight, insurancePrice } = quotation.package;
+            const { zipCode: to } = quotation.customerTo.adress;
+            const { zipCode: from } = quotation.customerFrom.adress;
+            const { data } = await this.adapterApi.post(`/tms/transporte/simular`, {
+                "cepOrigem": to,
+                "cepDestino": from,
+                "vlrMerc": insurancePrice,
+                "pesoMerc": weight,
+                "volumes": [
+                    {
+                        "peso": weight,
+                        "altura": width,
+                        "largura": height,
+                        "comprimento": length,
+                        "tipo": "string",
+                        "valor": insurancePrice,
+                        "quantidade": 1
+                    }
+                ],
+                "produtos": [
+                    {
+                        "peso": weight,
+                        "altura": width,
+                        "largura": height,
+                        "comprimento": length,
+                        "valor": insurancePrice,
+                        "quantidade": 1
+                    }
+                ],
+                //"servicos": [
+                //  "string"
+                //],
+                //"ordernar": "string"
+            });
+            return {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                options: data.map((option) => ({
+                    gateway: 'KG Quotation',
+                    company: option?.transp_nome,
+                    service: option.descricao,
+                    price: option.vlrFrete,
+                    deliveryEstimate: option.dtPrevEnt
+                })),
+                _metadata: data
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new Error("Erro ao calcular frete");
+        }
+    }
+}
+exports.default = KgQuotation;
+//# sourceMappingURL=index.js.map
