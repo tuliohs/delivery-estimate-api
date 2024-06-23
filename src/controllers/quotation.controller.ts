@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import packageService from '../services/packages.service';
 import type { QuotationRequest } from '../models/Shipping';
-import { defaultSender } from '../data/defaultData';
+import { defaultPackages, defaultSender } from '../data/defaultData';
 import type { Quotation, QuotationOption, QuotationOptionTag } from '../models/Quotation';
 import MelhorQuotation from '../adapters/MelhorQuotation';
 import KgQuotation from '../adapters/KgQuotation';
@@ -92,6 +92,13 @@ const quotationController = {
             console.error(error);
             res.status(500).json({ message: 'Erro ao fazer cotação', error: JSON.stringify(error) });
         }
+    },
+    listPackages(req: Request, res: Response) {
+        const packages = defaultPackages
+        res.status(200).json(packages);
+    },
+    defaultSender(req: Request, res: Response) {
+        res.status(200).json(defaultSender);
     }
 };
 
